@@ -1,64 +1,104 @@
-# 🌱 Smart Watering Pot
+# 🌿 Smart Watering Pot (NodeMCU + Blynk)
 
-The **Smart Watering Pot** is an automated plant watering system designed to monitor soil moisture and deliver the right amount of water to your plants—so they stay healthy even when you're away! This project integrates sensors, microcontrollers, and simple logic to take care of your greenery intelligently.
+This project is an **IoT-based Smart Irrigation System** built with a **NodeMCU (ESP8266)**, a **soil moisture sensor**, and the **Blynk IoT platform**. It automates watering your plants based on real-time soil moisture readings and allows manual control via a mobile app.
 
-## 🎥 Demo
+## 📽️ Video Demonstration
 
-Check out the full video demonstration here:
+▶️ [**Watch the Smart Watering Pot in Action**](https://drive.google.com/file/d/1hz0x3sRglbCHoY4dQrAdUuLIgjunMBsg/view?usp=sharing)
 
-[![Smart Watering Pot Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://drive.google.com/file/d/1hz0x3sRglbCHoY4dQrAdUuLIgjunMBsg/view?usp=sharing)
+---
 
-*Note: Since the video is hosted on Google Drive, click the link above to view it.*
+## 🚀 Features
 
-## 🌟 Features
+* 🌡️ **Soil Moisture Monitoring** – Real-time sensor readings sent to the Blynk app.
+* 💧 **Automatic + Manual Watering** – Automated logic + app-based control via virtual button.
+* 📱 **Blynk IoT Integration** – Control and monitor your plant from anywhere.
+* ⚡ **Low Power Microcontroller** – Runs on NodeMCU (ESP8266).
 
-* 🌡️ **Soil Moisture Monitoring** – Real-time data collection using a soil moisture sensor.
-* 💧 **Automatic Watering** – Triggers watering when soil is too dry.
-* 📦 **Compact & DIY Friendly** – Built with readily available components.
-* 🔋 **Low Power Consumption** – Ideal for long-term unattended use.
+---
 
-## 🧰 Hardware Used
+## 🧰 Hardware Components
 
-* Arduino (or compatible microcontroller)
-* Soil Moisture Sensor
-* Water Pump
-* Relay Module
-* Tubing
-* 12V Power Supply (or battery)
+| Component                                           | Description                   |
+| --------------------------------------------------- | ----------------------------- |
+| NodeMCU (ESP8266)                                   | Wi-Fi-enabled microcontroller |
+| Soil Moisture Sensor                                | Analog moisture detection     |
+| Relay Module / Transistor + Motor                   | Controls water pump           |
+| Mini Water Pump                                     | Delivers water to the plant   |
+| Tubing, Pot, Jumper Wires, Breadboard, Power Supply | etc.                          |
 
-## 💡 How It Works
+---
 
-1. The soil moisture sensor checks the moisture level.
-2. If moisture drops below the threshold, the Arduino activates the pump via a relay.
-3. Water is dispensed for a preset time, then automatically turned off.
+## 📲 Blynk Setup
 
-## 🚀 Getting Started
+1. Install the **Blynk IoT app** (Android/iOS).
 
-1. **Clone this repo**:
+2. Create a new template with:
 
-   ```bash
-   git clone https://github.com/your-username/smart-watering-pot.git
-   cd smart-watering-pot
+   * **Virtual Pin V6** → Moisture Level (Display)
+   * **Virtual Pin V2** → Motor Control (Button)
+
+3. Use the following credentials in the code:
+
+   ```cpp
+   #define BLYNK_TEMPLATE_ID "TMPL3VFIWAiSE"
+   #define BLYNK_TEMPLATE_NAME "Irrigation"
+   #define BLYNK_AUTH_TOKEN "LPez6z-1lm217wWOka9ZebAARlIG5Mdp"
    ```
-2. **Upload the code** to your Arduino using the Arduino IDE.
-3. **Assemble the hardware** as per the included wiring diagram.
-4. **Power it up**, and let your Smart Pot handle the watering!
 
-## 📁 Project Structure
+---
 
+## 💻 Code Overview
+
+```cpp
+const int moistureSensorPin = A0;
+const int motorPin = 4; // D2 on NodeMCU
+
+void loop() {
+  int moistureValue = analogRead(moistureSensorPin);
+  int moisturePercentage = map(moistureValue, wet, dry, 100, 0);
+  Blynk.virtualWrite(V6, moisturePercentage);
+  delay(1000);
+}
+
+BLYNK_WRITE(V2) {
+  int pinValue = param.asInt();
+  digitalWrite(motorPin, pinValue ? HIGH : LOW);
+}
 ```
-smart-watering-pot/
-├── images/                # Circuit diagrams and build photos
-├── SmartWatering.ino      # Arduino source code
-├── README.md              # Project documentation
+
+* **Moisture Level** is sent to virtual pin `V6`.
+* **Motor Control** is toggled with a button on `V2`.
+
+> Full source code available in [`SmartWatering.ino`](./SmartWatering.ino)
+
+---
+
+## 🔌 Circuit Diagram
+
+*(Optional: Insert wiring diagram or image here if available. I can help you make one too.)*
+
+Basic connections:
+
+* Soil sensor → A0
+* Pump → D2 via transistor/relay
+* Power → USB / 5V
+
+---
+
+## 🌱 Calibration
+
+Update these values based on your sensor's readings in dry/wet soil:
+
+```cpp
+const int dry = 1;
+const int wet = 400;
 ```
 
-## 📸 Gallery
+---
 
-*(Optional: Add screenshots, wiring diagrams, or a gif here)*
+## 🛠️ Future Enhancements
 
-## 🛠️ Future Improvements
-
-* Add Wi-Fi monitoring (ESP8266/ESP32)
-* Schedule-based watering
-* Mobile notifications
+* 🌐 Push alerts for critical moisture levels
+* 🕒 Scheduled watering using timers
+* 🌡️ Integrate temperature and humidity sensors
